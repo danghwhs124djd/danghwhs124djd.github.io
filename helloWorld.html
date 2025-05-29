@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Request with Credentials</title>
+    <script>
+        function makeCorsRequest() {
+            const xhr = new XMLHttpRequest();
+            const url = 'app-eu1.hubspot.com/api/login-verify/user-info
+
+            xhr.open('GET', url, true);
+            xhr.withCredentials = true; 
+
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    console.log('Response:', xhr.responseText);
+                } else {
+                    console.error('Request failed with status:', xhr.status);
+                }
+            };
+
+            xhr.onerror = function() {
+                console.error('Request failed');
+            };
+
+            xhr.send();
+        }
+
+        window.onload = makeCorsRequest;
+    </script>
+</head>
+<body>
+    <h1>HELLO </h1>
+</body>
+</html>
