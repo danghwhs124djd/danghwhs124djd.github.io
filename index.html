@@ -67,8 +67,9 @@ console.log("hello");
       xhr2.withCredentials = true;
       xhr2.setRequestHeader("Content-Type", "application/json");
       if (csrfToken) {
-        xhr2.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
+        xhr1.setRequestHeader("X-Hubspot-Csrf-Hubspotapi", csrfToken);
       }
+      
 console.log("hello");
       const userData = {
         users: [{ email: "dangerhm+3@wearehackerone.com" }],
