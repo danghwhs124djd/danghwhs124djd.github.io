@@ -48,7 +48,7 @@ function runExploit() {
       let portalId = null;
       try {
   const json = JSON.parse(xhr1.responseText);
-  portalId = json[0]?.id || json.id;
+  portalId = json.basicAccounts?.[0]?.id
   log(`[+] Extracted portalId: ${portalId}`);
 } catch (e) {
   log("[-] Failed to parse portalId:", e);
